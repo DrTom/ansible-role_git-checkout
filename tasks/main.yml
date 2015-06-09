@@ -1,0 +1,36 @@
+### git checkout ##############################################################
+
+- assert: 
+    that: git_checkout_target_path is defined
+
+- assert: 
+    that: git_checkout_repo is defined
+
+- name: Create target dir 
+  file: 
+    path: "{{git_checkout_target_path}}"
+    owner: root
+    group: root
+    state: directory
+    mode: 0755
+
+- name: 'register: is (already) a valid git repo?'
+  stat: 
+    path: "{{git_checkout_target_path}}/.git" 
+  register: git_checkout_target_stat
+
+- name: Set origin 
+  shell: cd  {{git_checkout_target_path}}  && git remote set-url origin {{git_checkout_repo}} 
+  changed_when: False
+  when: git_checkout_target_stat.stat.exists
+
+- name: Git clone or update project
+  git:  
+    repo: "{{git_checkout_repo}}"
+    accept_hostkey: true
+    dest: "{{git_checkout_target_path}}"
+    version: "{{git_checkout_version}}"
+    force: yes
+
+- name: Sync git submodules
+  shell: cd {{git_checkout_target_path}} && git submodule sync --recursive && git submodule update --init --recursive
