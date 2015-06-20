@@ -1,13 +1,13 @@
 ### git checkout ##############################################################
 
-- assert: 
+- assert:
     that: git_checkout_target_path is defined
 
-- assert: 
+- assert:
     that: git_checkout_repo is defined
 
-- name: Create target dir 
-  file: 
+- name: Create target dir
+  file:
     path: "{{git_checkout_target_path}}"
     owner: root
     group: root
@@ -15,17 +15,17 @@
     mode: 0755
 
 - name: 'register: is (already) a valid git repo?'
-  stat: 
-    path: "{{git_checkout_target_path}}/.git" 
+  stat:
+    path: "{{git_checkout_target_path}}/.git"
   register: git_checkout_target_stat
 
-- name: Set origin 
-  shell: cd  {{git_checkout_target_path}}  && git remote set-url origin {{git_checkout_repo}} 
+- name: Set origin
+  shell: cd  {{git_checkout_target_path}}  && git remote set-url origin {{git_checkout_repo}}
   changed_when: False
   when: git_checkout_target_stat.stat.exists
 
 - name: Git clone or update project
-  git:  
+  git:
     repo: "{{git_checkout_repo}}"
     accept_hostkey: true
     dest: "{{git_checkout_target_path}}"
