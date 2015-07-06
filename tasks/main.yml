@@ -29,16 +29,16 @@
   changed_when: False
   when: git_checkout_target_stat.stat.exists
 
-- name: Git clone or update project
-  git:
-    repo: "{{git_checkout_repo}}"
-    accept_hostkey: true
-    dest: "{{git_checkout_target_path}}"
-    version: "{{git_checkout_version}}"
-    force: yes
-
+- name: Update
+  shell: |
+    cd {{git_checkout_target_path}} \
+    && git fetch --all \
+    && git reset --hard {{git_checkout_version}} \
+    && git clean --force -fd
 
 - name: Sync git submodules
   shell: |
     cd {{git_checkout_target_path}} \
+    && git submodule foreach --recursive 'git reset --hard HEAD' \
+    && git submodule sync --recursive \
     && git submodule update --init --recursive
