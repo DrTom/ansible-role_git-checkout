@@ -40,14 +40,6 @@
     && git reset --hard {{git_checkout_version}} \
     && git clean --force -fd
 
-
-- name: Clean submodules
-  shell: |
-    cd {{git_checkout_target_path}} \
-    && git submodule foreach --recursive \
-      'git reset --hard HEAD && git clean --force -fd'
-  when: git_checkout_target_stat.stat.exists
-
 - name: Sync git submodules
   shell: |
     cd {{git_checkout_target_path}} \
