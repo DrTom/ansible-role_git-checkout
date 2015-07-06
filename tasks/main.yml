@@ -6,12 +6,17 @@
 - assert:
     that: git_checkout_repo is defined
 
+- name: Clean slate
+  shell: rm -rf {{git_checkout_target_path}}
+  when: git_checkout_clean_slate
+
 - name: Create target dir
   file:
     path: "{{git_checkout_target_path}}"
     owner: root
     group: root
     state: directory
+    recurse: true
     mode: 0755
 
 - name: 'register: is (already) a valid git repo?'
@@ -24,13 +29,18 @@
   changed_when: False
   when: git_checkout_target_stat.stat.exists
 
-- name: Git clone or update project
-  git:
-    repo: "{{git_checkout_repo}}"
-    accept_hostkey: true
-    dest: "{{git_checkout_target_path}}"
-    version: "{{git_checkout_version}}"
-    force: yes
+- name: Initial Clone
+  shell: git clone {{git_checkout_repo}} {{git_checkout_target_path}}
+  when: not git_checkout_target_stat.stat.exists
+
+- name: Update
+  shell: |
+    cd {{git_checkout_target_path}} \
+    && git fetch --all \
+    && git reset --hard {{git_checkout_version}} \
+    && git clean --force -fd
 
 - name: Sync git submodules
-  shell: cd {{git_checkout_target_path}} && git submodule sync --recursive && git submodule update --init --recursive
+  shell: |
+    cd {{git_checkout_target_path}} \
+    && git submodule update --init --recursive
