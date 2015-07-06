@@ -29,6 +29,10 @@
   changed_when: False
   when: git_checkout_target_stat.stat.exists
 
+- name: Initial Clone
+  shell: git clone {{git_checkout_repo}} {{git_checkout_target_path}}
+  when: not git_checkout_target_stat.stat.exists
+
 - name: Update
   shell: |
     cd {{git_checkout_target_path}} \
