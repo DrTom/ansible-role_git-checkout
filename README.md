@@ -16,3 +16,8 @@ submodules.
       git_checkout_version: "{{ lookup('pipe','cd  ./../. && git log -n 1 --format=%H') }}"
 
 
+## Caveat
+
+There are scenarios which are very hard to recover from. If this role will fall
+back to a fresh clone if it hits such a case. It will then also **wipe out the
+existing clone including all unmanaged or changed files**!
