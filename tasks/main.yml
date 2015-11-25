@@ -85,3 +85,12 @@
     git submodule update --init --recursive
   when: git_checkout_clean_slate
 
+- name: Change owner
+  file:
+    path: "{{git_checkout_target_path}}"
+    owner: "{{git_checkout_owner}}"
+    group: "{{git_checkout_owner}}"
+    state: directory
+    recurse: true
+    mode: 0755
+
